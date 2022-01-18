@@ -56,7 +56,7 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
           // add task button
-          MyButton(label: '+ Add Task', onTap: () => Get.to(AddTaskPage())),
+          MyButton(label: '+ Add Task', onTap: () => Get.to(() => AddTaskPage())),
         ],
       ),
     );
