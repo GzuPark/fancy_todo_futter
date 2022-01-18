@@ -1,6 +1,7 @@
 import 'package:date_picker_timeline/date_picker_timeline.dart';
 import 'package:fancy_todo_flutter/services/notification_services.dart';
 import 'package:fancy_todo_flutter/services/theme_services.dart';
+import 'package:fancy_todo_flutter/ui/add_task_bar.dart';
 import 'package:fancy_todo_flutter/ui/theme.dart';
 import 'package:fancy_todo_flutter/ui/widgets/button.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +18,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final NotifyHelper notifyHelper = NotifyHelper();
+  DateTime _selectedDate = DateTime.now();
 
   @override
   void initState() {
@@ -54,7 +56,7 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
           // add task button
-          MyButton(label: '+ Add Task', onTap: () => null),
+          MyButton(label: '+ Add Task', onTap: () => Get.to(() => AddTaskPage())),
         ],
       ),
     );
@@ -73,7 +75,9 @@ class _HomePageState extends State<HomePage> {
         dateTextStyle: _datePickerStyle(20),
         dayTextStyle: _datePickerStyle(16),
         monthTextStyle: _datePickerStyle(14),
-        onDateChange: (date) {},
+        onDateChange: (date) {
+          _selectedDate = date;
+        },
       ),
     );
   }
