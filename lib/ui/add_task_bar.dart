@@ -200,11 +200,17 @@ class _AddTaskPageState extends State<AddTaskPage> {
   }
 
   Future<TimeOfDay?> _showTimePicker(String time) {
+    int _shift = 0;
+
+    if (time.contains('PM')) {
+      _shift += 12;
+    }
+
     return showTimePicker(
       context: context,
       initialEntryMode: TimePickerEntryMode.input,
       initialTime: TimeOfDay(
-        hour: int.parse(time.split(':')[0]),
+        hour: int.parse(time.split(':')[0]) + _shift,
         minute: int.parse(time.split(':')[1].split(' ')[0]),
       ),
     );
