@@ -1,3 +1,5 @@
+import 'package:fancy_todo_flutter/controllers/task_controller.dart';
+import 'package:fancy_todo_flutter/models/task.dart';
 import 'package:fancy_todo_flutter/ui/theme.dart';
 import 'package:fancy_todo_flutter/ui/widgets/button.dart';
 import 'package:fancy_todo_flutter/ui/widgets/input_field.dart';
@@ -13,6 +15,11 @@ class AddTaskPage extends StatefulWidget {
 }
 
 class _AddTaskPageState extends State<AddTaskPage> {
+  final TaskController _taskController = Get.put(TaskController());
+
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _noteController = TextEditingController();
+
   DateTime _selectedDate = DateTime.now();
   String _startTime = DateFormat('hh:mm a').format(DateTime.now());
   String _endTime = DateFormat('hh:mm a').format(DateTime.now().add(const Duration(hours: 1)));
@@ -37,8 +44,8 @@ class _AddTaskPageState extends State<AddTaskPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text('Add Task', style: headingStyle),
-              InputField(title: 'Title', hint: 'Enter your title'),
-              InputField(title: 'Note', hint: 'Enter your note '),
+              InputField(title: 'Title', hint: 'Enter your title', controller: _titleController),
+              InputField(title: 'Note', hint: 'Enter your note ', controller: _noteController),
               InputField(
                 title: 'Date',
                 hint: DateFormat.yMd().format(_selectedDate),
@@ -132,7 +139,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   _colorPalette(),
-                  MyButton(label: 'Create Task', onTap: () => null),
+                  MyButton(label: 'Create Task', onTap: () => _validateData()),
                 ],
               ),
             ],
@@ -248,5 +255,37 @@ class _AddTaskPageState extends State<AddTaskPage> {
         ),
       ],
     );
+  }
+
+  void _addTaskToDb() async {
+    await _taskController.addTask(
+      task: Task(
+        title: _titleController.text,
+        note: _noteController.text,
+        isCompleted: 0,
+        date: DateFormat.yMd().format(_selectedDate),
+        startTime: _startTime,
+        endTime: _endTime,
+        color: _selectedColor,
+        remind: _selectedRemind,
+        repeat: _selectedRepeat,
+      ),
+    );
+  }
+
+  void _validateData() {
+    if (_titleController.text.isNotEmpty && _noteController.text.isNotEmpty) {
+      _addTaskToDb();
+      Get.back();
+    } else if (_titleController.text.isEmpty || _noteController.text.isEmpty) {
+      Get.snackbar(
+        'Required',
+        'All fields are required!',
+        snackPosition: SnackPosition.BOTTOM,
+        colorText: pinkColor,
+        backgroundColor: Colors.white,
+        icon: Icon(Icons.warning_amber_rounded, color: Colors.red),
+      );
+    }
   }
 }
