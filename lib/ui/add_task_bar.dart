@@ -1,4 +1,5 @@
 import 'package:fancy_todo_flutter/ui/theme.dart';
+import 'package:fancy_todo_flutter/ui/widgets/button.dart';
 import 'package:fancy_todo_flutter/ui/widgets/input_field.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -21,6 +22,8 @@ class _AddTaskPageState extends State<AddTaskPage> {
 
   String _selectedRepeat = 'None';
   List<String> repeatList = ['None', 'Daily', 'Weekly', 'Monthly'];
+
+  int _selectedColor = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -122,6 +125,16 @@ class _AddTaskPageState extends State<AddTaskPage> {
                   },
                 ),
               ),
+              const SizedBox(height: 18),
+              // pick a color & create task button
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _colorPalette(),
+                  MyButton(label: 'Create Task', onTap: () => null),
+                ],
+              ),
             ],
           ),
         ),
@@ -194,6 +207,40 @@ class _AddTaskPageState extends State<AddTaskPage> {
         hour: int.parse(time.split(':')[0]),
         minute: int.parse(time.split(':')[1].split(' ')[0]),
       ),
+    );
+  }
+
+  Column _colorPalette() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Color', style: titleStyle),
+        const SizedBox(height: 8),
+        // colors list
+        Wrap(
+          children: List<Widget>.generate(3, (int index) {
+            return GestureDetector(
+              child: Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: CircleAvatar(
+                  radius: 14,
+                  backgroundColor: index == 0
+                      ? primaryColor
+                      : index == 1
+                          ? pinkColor
+                          : yellowColor,
+                  child: _selectedColor == index ? Icon(Icons.done, size: 16, color: Colors.white) : Container(),
+                ),
+              ),
+              onTap: () {
+                setState(() {
+                  _selectedColor = index;
+                });
+              },
+            );
+          }),
+        ),
+      ],
     );
   }
 }
