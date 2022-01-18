@@ -1,3 +1,4 @@
+import 'package:fancy_todo_flutter/db/db_helper.dart';
 import 'package:fancy_todo_flutter/services/theme_services.dart';
 import 'package:fancy_todo_flutter/ui/home_page.dart';
 import 'package:fancy_todo_flutter/ui/theme.dart';
@@ -7,6 +8,7 @@ import 'package:get_storage/get_storage.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await DBHelper.initDb();
   await GetStorage.init();
   runApp(const MyApp());
 }
