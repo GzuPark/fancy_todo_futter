@@ -1,5 +1,7 @@
+import 'package:fancy_todo_flutter/services/notification_services.dart';
 import 'package:fancy_todo_flutter/services/theme_services.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -9,6 +11,15 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final NotifyHelper notifyHelper = NotifyHelper();
+
+  @override
+  void initState() {
+    super.initState();
+    notifyHelper.initializeNotification();
+    notifyHelper.requestIOSPermissions();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,6 +36,11 @@ class _HomePageState extends State<HomePage> {
         child: const Icon(Icons.nightlight_round, size: 20),
         onTap: () {
           ThemeService().switchTheme();
+          notifyHelper.instantNotification(
+            title: 'Theme changed',
+            body: 'Activated ${Get.isDarkMode ? 'Light' : 'Dark'} Theme',
+          );
+          notifyHelper.scheduledNotification();
         },
       ), // beginning of the appbar
       actions: const [
