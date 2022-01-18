@@ -1,7 +1,9 @@
 import 'package:fancy_todo_flutter/services/notification_services.dart';
 import 'package:fancy_todo_flutter/services/theme_services.dart';
+import 'package:fancy_todo_flutter/ui/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -25,15 +27,39 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: _appBar(),
       body: Column(
-        children: [Text('Theme Data', style: TextStyle(fontSize: 30))],
+        children: [
+          // top layer
+          Row(
+            children: [
+              // today's date
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // intl helps to convert date's type to show
+                    Text(DateFormat.yMMMMd().format(DateTime.now()), style: subHeadingStyle),
+                    Text('Today', style: headingStyle),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
 
   AppBar _appBar() {
     return AppBar(
+      elevation: 0,
+      backgroundColor: context.theme.backgroundColor,
       leading: GestureDetector(
-        child: const Icon(Icons.nightlight_round, size: 20),
+        child: Icon(
+          Get.isDarkMode ? Icons.wb_sunny_rounded : Icons.nightlight_round,
+          color: Get.isDarkMode ? Colors.white : Colors.black,
+          size: 20,
+        ),
         onTap: () {
           ThemeService().switchTheme();
           notifyHelper.instantNotification(
@@ -44,7 +70,7 @@ class _HomePageState extends State<HomePage> {
         },
       ), // beginning of the appbar
       actions: const [
-        Icon(Icons.person, size: 20),
+        CircleAvatar(backgroundImage: AssetImage('assets/img/profile.png')),
         SizedBox(width: 20),
       ],
     );
