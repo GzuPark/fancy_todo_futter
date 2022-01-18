@@ -1,9 +1,11 @@
+import 'package:date_picker_timeline/date_picker_timeline.dart';
 import 'package:fancy_todo_flutter/services/notification_services.dart';
 import 'package:fancy_todo_flutter/services/theme_services.dart';
 import 'package:fancy_todo_flutter/ui/theme.dart';
 import 'package:fancy_todo_flutter/ui/widgets/button.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 class HomePage extends StatefulWidget {
@@ -30,6 +32,7 @@ class _HomePageState extends State<HomePage> {
       body: Column(
         children: [
           _addTaskBar(), // top first layer - date & add task button
+          _addDateBar(), // top second layer - date picker timeline
         ],
       ),
     );
@@ -53,6 +56,34 @@ class _HomePageState extends State<HomePage> {
           // add task button
           MyButton(label: '+ Add Task', onTap: () => null),
         ],
+      ),
+    );
+  }
+
+  Container _addDateBar() {
+    return Container(
+      margin: const EdgeInsets.only(left: 20, top: 20),
+      child: DatePicker(
+        DateTime.now(),
+        height: 100,
+        width: 80,
+        initialSelectedDate: DateTime.now(),
+        selectionColor: primaryColor,
+        selectedTextColor: Colors.white,
+        dateTextStyle: _datePickerStyle(20),
+        dayTextStyle: _datePickerStyle(16),
+        monthTextStyle: _datePickerStyle(14),
+        onDateChange: (date) {},
+      ),
+    );
+  }
+
+  TextStyle _datePickerStyle(double size) {
+    return GoogleFonts.lato(
+      textStyle: TextStyle(
+        fontSize: size,
+        fontWeight: FontWeight.w600,
+        color: Colors.grey,
       ),
     );
   }
