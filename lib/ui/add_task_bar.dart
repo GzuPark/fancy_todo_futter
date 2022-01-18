@@ -1,3 +1,5 @@
+import 'package:fancy_todo_flutter/controllers/task_controller.dart';
+import 'package:fancy_todo_flutter/models/task.dart';
 import 'package:fancy_todo_flutter/ui/theme.dart';
 import 'package:fancy_todo_flutter/ui/widgets/button.dart';
 import 'package:fancy_todo_flutter/ui/widgets/input_field.dart';
@@ -13,6 +15,8 @@ class AddTaskPage extends StatefulWidget {
 }
 
 class _AddTaskPageState extends State<AddTaskPage> {
+  final TaskController _taskController = Get.put(TaskController());
+
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _noteController = TextEditingController();
 
@@ -253,8 +257,25 @@ class _AddTaskPageState extends State<AddTaskPage> {
     );
   }
 
+  void _addTaskToDb() async {
+    await _taskController.addTask(
+      task: Task(
+        title: _titleController.text,
+        note: _noteController.text,
+        isCompleted: 0,
+        date: DateFormat.yMd().format(_selectedDate),
+        startTime: _startTime,
+        endTime: _endTime,
+        color: _selectedColor,
+        remind: _selectedRemind,
+        repeat: _selectedRepeat,
+      ),
+    );
+  }
+
   void _validateData() {
     if (_titleController.text.isNotEmpty && _noteController.text.isNotEmpty) {
+      _addTaskToDb();
       Get.back();
     } else if (_titleController.text.isEmpty || _noteController.text.isEmpty) {
       Get.snackbar(
