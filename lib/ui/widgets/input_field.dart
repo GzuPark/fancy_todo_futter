@@ -36,6 +36,7 @@ class InputField extends StatelessWidget {
               children: [
                 Expanded(
                   child: TextFormField(
+                    readOnly: widget == null ? false : true,
                     autofocus: false,
                     cursorColor: Get.isDarkMode ? Colors.grey[100] : Colors.grey[700],
                     controller: controller,
@@ -52,6 +53,8 @@ class InputField extends StatelessWidget {
                     ),
                   ),
                 ),
+                // boolean - more icon with customized action
+                widget == null ? Container() : Container(child: widget),
               ],
             ),
           ),
