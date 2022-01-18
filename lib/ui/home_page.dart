@@ -1,6 +1,7 @@
 import 'package:fancy_todo_flutter/services/notification_services.dart';
 import 'package:fancy_todo_flutter/services/theme_services.dart';
 import 'package:fancy_todo_flutter/ui/theme.dart';
+import 'package:fancy_todo_flutter/ui/widgets/button.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -28,23 +29,29 @@ class _HomePageState extends State<HomePage> {
       appBar: _appBar(),
       body: Column(
         children: [
-          // top layer
-          Row(
+          _addTaskBar(), // top first layer - date & add task button
+        ],
+      ),
+    );
+  }
+
+  Container _addTaskBar() {
+    return Container(
+      margin: const EdgeInsets.only(left: 20, right: 20, top: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          // today's date
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // today's date
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // intl helps to convert date's type to show
-                    Text(DateFormat.yMMMMd().format(DateTime.now()), style: subHeadingStyle),
-                    Text('Today', style: headingStyle),
-                  ],
-                ),
-              ),
+              // intl helps to convert date's type to show
+              Text(DateFormat.yMMMMd().format(DateTime.now()), style: subHeadingStyle),
+              Text('Today', style: headingStyle),
             ],
           ),
+          // add task button
+          MyButton(label: '+ Add Task', onTap: () => null),
         ],
       ),
     );
