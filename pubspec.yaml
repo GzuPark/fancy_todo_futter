@@ -37,6 +37,8 @@ dependencies:
 
   get_storage: ^2.0.3
   get: ^4.6.1
+  flutter_local_notifications: ^9.2.0
+  flutter_native_timezone: ^2.0.0
 
 dev_dependencies:
   flutter_test:
