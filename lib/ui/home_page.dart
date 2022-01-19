@@ -90,7 +90,9 @@ class _HomePageState extends State<HomePage> {
         dayTextStyle: _datePickerStyle(16),
         monthTextStyle: _datePickerStyle(14),
         onDateChange: (date) {
-          _selectedDate = date;
+          setState(() {
+            _selectedDate = date;
+          });
         },
       ),
     );
@@ -112,23 +114,56 @@ class _HomePageState extends State<HomePage> {
         return ListView.builder(
           itemCount: _taskController.taskList.length,
           itemBuilder: (_, int index) {
-            return AnimationConfiguration.staggeredList(
-              position: index,
-              child: SlideAnimation(
-                child: FadeInAnimation(
-                  child: Row(
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          _showBottomSheet(context, _taskController.taskList[index]);
-                        },
-                        child: TaskTile(_taskController.taskList[index]),
-                      ),
-                    ],
+            Task task = _taskController.taskList[index];
+
+            if (task.repeat == 'Daily') {
+              DateTime date = DateFormat.jm().parse(task.startTime.toString());
+              String myTime = DateFormat('HH:mm').format(date).toString();
+              int _hour = int.parse(myTime.split(':')[0]);
+              int _minutes = int.parse(myTime.split(':')[1]);
+
+              notifyHelper.scheduledNotification(task, _hour, _minutes);
+
+              return AnimationConfiguration.staggeredList(
+                position: index,
+                child: SlideAnimation(
+                  child: FadeInAnimation(
+                    child: Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            _showBottomSheet(context, task);
+                          },
+                          child: TaskTile(task),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            );
+              );
+            }
+
+            if (task.date == DateFormat.yMd().format(_selectedDate)) {
+              return AnimationConfiguration.staggeredList(
+                position: index,
+                child: SlideAnimation(
+                  child: FadeInAnimation(
+                    child: Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            _showBottomSheet(context, task);
+                          },
+                          child: TaskTile(task),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            } else {
+              return Container();
+            }
           },
         );
       }),
@@ -241,7 +276,6 @@ class _HomePageState extends State<HomePage> {
             title: 'Theme changed',
             body: 'Activated ${Get.isDarkMode ? 'Light' : 'Dark'} Theme',
           );
-          notifyHelper.scheduledNotification();
         },
       ), // beginning of the appbar
       actions: const [
