@@ -117,6 +117,13 @@ class _HomePageState extends State<HomePage> {
             Task task = _taskController.taskList[index];
 
             if (task.repeat == 'Daily') {
+              DateTime date = DateFormat.jm().parse(task.startTime.toString());
+              String myTime = DateFormat('HH:mm').format(date).toString();
+              int _hour = int.parse(myTime.split(':')[0]);
+              int _minutes = int.parse(myTime.split(':')[1]);
+
+              notifyHelper.scheduledNotification(task, _hour, _minutes);
+
               return AnimationConfiguration.staggeredList(
                 position: index,
                 child: SlideAnimation(
@@ -269,7 +276,6 @@ class _HomePageState extends State<HomePage> {
             title: 'Theme changed',
             body: 'Activated ${Get.isDarkMode ? 'Light' : 'Dark'} Theme',
           );
-          notifyHelper.scheduledNotification();
         },
       ), // beginning of the appbar
       actions: const [
