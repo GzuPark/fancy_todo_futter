@@ -81,7 +81,7 @@ class NotifyHelper {
     );
   }
 
-  void scheduledNotification(Task task, int hour, int minutes) async {
+  void scheduledNotification(Task task, String period, int hour, int minutes) async {
     const iOSPlatformChannelSpecifics = IOSNotificationDetails();
     const androidPlatformChannelSpecifics = AndroidNotificationDetails(
       'fancy_todo_flutter',
@@ -95,6 +95,13 @@ class NotifyHelper {
       iOS: iOSPlatformChannelSpecifics,
     );
 
+    var _alertPeriod = DateTimeComponents.time;
+    if (period == 'Weekly') {
+      _alertPeriod = DateTimeComponents.dayOfWeekAndTime;
+    } else if (period == 'Monthly') {
+      _alertPeriod = DateTimeComponents.dayOfMonthAndTime;
+    }
+
     await flutterLocalNotificationsPlugin.zonedSchedule(
       task.id!.toInt(),
       task.title,
@@ -103,7 +110,7 @@ class NotifyHelper {
       platformChannelSpecifics,
       androidAllowWhileIdle: true,
       uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
-      matchDateTimeComponents: DateTimeComponents.time,
+      matchDateTimeComponents: _alertPeriod,
       payload: '${task.title}|${task.note}',
     );
   }
