@@ -116,57 +116,61 @@ class _HomePageState extends State<HomePage> {
           itemBuilder: (_, int index) {
             Task task = _taskController.taskList[index];
 
-            if (task.repeat == 'Daily') {
-              DateTime date = DateFormat.jm().parse(task.startTime.toString());
-              String myTime = DateFormat('HH:mm').format(date).toString();
-              int _hour = int.parse(myTime.split(':')[0]);
-              int _minutes = int.parse(myTime.split(':')[1]);
+            int _year = int.parse(task.date!.split('/')[2]);
+            int _month = int.parse(task.date!.split('/')[0]);
+            int _day = int.parse(task.date!.split('/')[1]);
 
-              notifyHelper.scheduledNotification(task, _hour, _minutes);
+            DateTime date = DateFormat.jm().parse(task.startTime.toString());
+            String myTime = DateFormat('HH:mm').format(date).toString();
 
-              return AnimationConfiguration.staggeredList(
-                position: index,
-                child: SlideAnimation(
-                  child: FadeInAnimation(
-                    child: Row(
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            _showBottomSheet(context, task);
-                          },
-                          child: TaskTile(task),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            }
+            int _hour = int.parse(myTime.split(':')[0]);
+            int _minutes = int.parse(myTime.split(':')[1]);
+
+            DateTime _taskDate = DateTime(_year, _month, _day, _hour, _minutes);
 
             if (task.date == DateFormat.yMd().format(_selectedDate)) {
-              return AnimationConfiguration.staggeredList(
-                position: index,
-                child: SlideAnimation(
-                  child: FadeInAnimation(
-                    child: Row(
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            _showBottomSheet(context, task);
-                          },
-                          child: TaskTile(task),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
+              return _drawAnimationCards(task, index);
+            }
+
+            if (task.repeat != 'None' && _taskDate.isBefore(_selectedDate)) {
+              DateTime _alertTime = _taskDate.subtract(Duration(minutes: task.remind!));
+
+              notifyHelper.scheduledNotification(task, task.repeat!, _alertTime.hour, _alertTime.minute);
+
+              if (task.repeat == 'Daily') {
+                return _drawAnimationCards(task, index);
+              } else if (task.repeat == 'Weekly' &&
+                  DateFormat.E().format(_taskDate) == DateFormat.E().format(_selectedDate)) {
+                return _drawAnimationCards(task, index);
+              } else if (task.repeat == 'Monthly' && _taskDate.day == _selectedDate.day) {
+                return _drawAnimationCards(task, index);
+              } else {
+                return Container();
+              }
             } else {
               return Container();
             }
           },
         );
       }),
+    );
+  }
+
+  _drawAnimationCards(Task task, int index) {
+    return AnimationConfiguration.staggeredList(
+      position: index,
+      child: SlideAnimation(
+        child: FadeInAnimation(
+          child: Row(
+            children: [
+              GestureDetector(
+                onTap: () => _showBottomSheet(context, task),
+                child: TaskTile(task),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
