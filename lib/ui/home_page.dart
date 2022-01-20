@@ -178,9 +178,7 @@ class _HomePageState extends State<HomePage> {
     Get.bottomSheet(
       Container(
         padding: const EdgeInsets.only(top: 4),
-        height: task.isCompleted == 1
-            ? MediaQuery.of(context).size.height * 0.24
-            : MediaQuery.of(context).size.height * 0.32,
+        height: MediaQuery.of(context).size.height * 0.40,
         color: Get.isDarkMode ? darkGreyColor : Colors.white,
         child: Column(
           children: [
@@ -194,17 +192,25 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             const Spacer(),
-            task.isCompleted == 1
-                ? Container()
-                : _bottomSheetButton(
-                    context: context,
-                    label: 'Task Completed',
-                    color: primaryColor,
-                    onTap: () {
-                      _taskController.markTaskCompleted(task.id!);
-                      Get.back();
-                    },
-                  ),
+            _bottomSheetButton(
+              context: context,
+              label: task.isCompleted == 0 ? 'Task Completed' : 'Back Uncompleted',
+              color: primaryColor,
+              onTap: () {
+                _taskController.markTaskCompleted(task.id!, task.isCompleted! == 0 ? 1 : 0);
+                Get.back();
+              },
+            ),
+            const SizedBox(height: 10),
+            _bottomSheetButton(
+              context: context,
+              label: 'Edit Task',
+              color: yellowColor,
+              onTap: () async {
+                await Get.to(() => AddTaskPage(task: task));
+                Get.back();
+              },
+            ),
             const SizedBox(height: 10),
             _bottomSheetButton(
               context: context,
