@@ -1,5 +1,9 @@
 # Fancy TODOs Application (Flutter Demo)
 
+## Demo
+
+![](./assets/docs/video_fancy_todo_application.gif)
+
 ## Issues
 - When you build iOS application using by M1, it will occur an error like below:
     ```txt
