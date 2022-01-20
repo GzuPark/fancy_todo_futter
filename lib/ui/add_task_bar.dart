@@ -8,7 +8,9 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 class AddTaskPage extends StatefulWidget {
-  const AddTaskPage({Key? key}) : super(key: key);
+  Task? task;
+
+  AddTaskPage({Key? key, this.task}) : super(key: key);
 
   @override
   State<AddTaskPage> createState() => _AddTaskPageState();
@@ -24,13 +26,34 @@ class _AddTaskPageState extends State<AddTaskPage> {
   String _startTime = DateFormat('hh:mm a').format(DateTime.now());
   String _endTime = DateFormat('hh:mm a').format(DateTime.now().add(const Duration(hours: 1)));
 
-  int _selectedRemind = 5;
-  List<int> remindList = [5, 10, 15, 20];
+  int _selectedRemind = 0;
+  List<int> remindList = [0, 5, 10, 30, 60];
 
   String _selectedRepeat = 'None';
   List<String> repeatList = ['None', 'Daily', 'Weekly', 'Monthly'];
 
   int _selectedColor = 0;
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.task != null) {
+      _titleController.text = widget.task!.title!;
+      _noteController.text = widget.task!.note!;
+
+      int _year = int.parse(widget.task!.date!.split('/')[2]);
+      int _month = int.parse(widget.task!.date!.split('/')[0]);
+      int _day = int.parse(widget.task!.date!.split('/')[1]);
+      _selectedDate = DateTime(_year, _month, _day);
+
+      _startTime = widget.task!.startTime!;
+      _endTime = widget.task!.endTime!;
+      _selectedColor = widget.task!.color!;
+      _selectedRemind = widget.task!.remind!;
+      _selectedRepeat = widget.task!.repeat!;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +66,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Add Task', style: headingStyle),
+              Text(widget.task == null ? 'Add Task' : 'Edit Task', style: headingStyle),
               InputField(title: 'Title', hint: 'Enter your title', controller: _titleController),
               InputField(title: 'Note', hint: 'Enter your note ', controller: _noteController),
               InputField(
@@ -139,7 +162,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   _colorPalette(),
-                  MyButton(label: 'Create Task', onTap: () => _validateData()),
+                  MyButton(label: widget.task == null ? 'Create Task' : 'Update Task', onTap: () => _validateData()),
                 ],
               ),
             ],
@@ -273,9 +296,30 @@ class _AddTaskPageState extends State<AddTaskPage> {
     );
   }
 
+  void _updateTaskToDb() async {
+    await _taskController.updateTask(
+      task: Task(
+        id: widget.task!.id,
+        title: _titleController.text,
+        note: _noteController.text,
+        isCompleted: widget.task!.isCompleted,
+        date: DateFormat.yMd().format(_selectedDate),
+        startTime: _startTime,
+        endTime: _endTime,
+        color: _selectedColor,
+        remind: _selectedRemind,
+        repeat: _selectedRepeat,
+      ),
+    );
+  }
+
   void _validateData() {
     if (_titleController.text.isNotEmpty && _noteController.text.isNotEmpty) {
-      _addTaskToDb();
+      if (widget.task == null) {
+        _addTaskToDb();
+      } else {
+        _updateTaskToDb();
+      }
       Get.back();
     } else if (_titleController.text.isEmpty || _noteController.text.isEmpty) {
       Get.snackbar(

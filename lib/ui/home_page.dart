@@ -116,51 +116,37 @@ class _HomePageState extends State<HomePage> {
           itemBuilder: (_, int index) {
             Task task = _taskController.taskList[index];
 
-            if (task.repeat == 'Daily') {
-              DateTime date = DateFormat.jm().parse(task.startTime.toString());
-              String myTime = DateFormat('HH:mm').format(date).toString();
-              int _hour = int.parse(myTime.split(':')[0]);
-              int _minutes = int.parse(myTime.split(':')[1]);
+            int _year = int.parse(task.date!.split('/')[2]);
+            int _month = int.parse(task.date!.split('/')[0]);
+            int _day = int.parse(task.date!.split('/')[1]);
 
-              notifyHelper.scheduledNotification(task, _hour, _minutes);
+            DateTime date = DateFormat.jm().parse(task.startTime.toString());
+            String myTime = DateFormat('HH:mm').format(date).toString();
 
-              return AnimationConfiguration.staggeredList(
-                position: index,
-                child: SlideAnimation(
-                  child: FadeInAnimation(
-                    child: Row(
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            _showBottomSheet(context, task);
-                          },
-                          child: TaskTile(task),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            }
+            int _hour = int.parse(myTime.split(':')[0]);
+            int _minutes = int.parse(myTime.split(':')[1]);
+
+            DateTime _taskDate = DateTime(_year, _month, _day, _hour, _minutes);
 
             if (task.date == DateFormat.yMd().format(_selectedDate)) {
-              return AnimationConfiguration.staggeredList(
-                position: index,
-                child: SlideAnimation(
-                  child: FadeInAnimation(
-                    child: Row(
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            _showBottomSheet(context, task);
-                          },
-                          child: TaskTile(task),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
+              return _drawAnimationCards(task, index);
+            }
+
+            if (task.repeat != 'None' && _taskDate.isBefore(_selectedDate)) {
+              DateTime _alertTime = _taskDate.subtract(Duration(minutes: task.remind!));
+
+              notifyHelper.scheduledNotification(task, task.repeat!, _alertTime.hour, _alertTime.minute);
+
+              if (task.repeat == 'Daily') {
+                return _drawAnimationCards(task, index);
+              } else if (task.repeat == 'Weekly' &&
+                  DateFormat.E().format(_taskDate) == DateFormat.E().format(_selectedDate)) {
+                return _drawAnimationCards(task, index);
+              } else if (task.repeat == 'Monthly' && _taskDate.day == _selectedDate.day) {
+                return _drawAnimationCards(task, index);
+              } else {
+                return Container();
+              }
             } else {
               return Container();
             }
@@ -170,13 +156,29 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  _drawAnimationCards(Task task, int index) {
+    return AnimationConfiguration.staggeredList(
+      position: index,
+      child: SlideAnimation(
+        child: FadeInAnimation(
+          child: Row(
+            children: [
+              GestureDetector(
+                onTap: () => _showBottomSheet(context, task),
+                child: TaskTile(task),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   void _showBottomSheet(BuildContext context, Task task) {
     Get.bottomSheet(
       Container(
         padding: const EdgeInsets.only(top: 4),
-        height: task.isCompleted == 1
-            ? MediaQuery.of(context).size.height * 0.24
-            : MediaQuery.of(context).size.height * 0.32,
+        height: MediaQuery.of(context).size.height * 0.40,
         color: Get.isDarkMode ? darkGreyColor : Colors.white,
         child: Column(
           children: [
@@ -190,17 +192,25 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             const Spacer(),
-            task.isCompleted == 1
-                ? Container()
-                : _bottomSheetButton(
-                    context: context,
-                    label: 'Task Completed',
-                    color: primaryColor,
-                    onTap: () {
-                      _taskController.markTaskCompleted(task.id!);
-                      Get.back();
-                    },
-                  ),
+            _bottomSheetButton(
+              context: context,
+              label: task.isCompleted == 0 ? 'Task Completed' : 'Back Uncompleted',
+              color: primaryColor,
+              onTap: () {
+                _taskController.markTaskCompleted(task.id!, task.isCompleted! == 0 ? 1 : 0);
+                Get.back();
+              },
+            ),
+            const SizedBox(height: 10),
+            _bottomSheetButton(
+              context: context,
+              label: 'Edit Task',
+              color: yellowColor,
+              onTap: () async {
+                await Get.to(() => AddTaskPage(task: task));
+                Get.back();
+              },
+            ),
             const SizedBox(height: 10),
             _bottomSheetButton(
               context: context,

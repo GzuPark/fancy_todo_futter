@@ -46,11 +46,15 @@ class DBHelper {
     return await _db!.query(_tableName);
   }
 
+  static update(Task? task) async {
+    await _db!.update(_tableName, task!.toJson(), where: "id = ?", whereArgs: [task.id]);
+  }
+
   static delete(Task task) async {
     await _db!.delete(_tableName, where: 'id = ?', whereArgs: [task.id]);
   }
 
-  static update(int id) async {
-    await _db!.rawUpdate('UPDATE $_tableName SET isCompleted = ? WHERE id = ?', [1, id]);
+  static updateIsCompleted(int id, int isCompleted) async {
+    await _db!.rawUpdate('UPDATE $_tableName SET isCompleted = ? WHERE id = ?', [isCompleted, id]);
   }
 }
